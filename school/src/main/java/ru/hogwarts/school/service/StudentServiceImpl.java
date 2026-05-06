@@ -1,6 +1,6 @@
 package ru.hogwarts.school.service;
 
-import java.util.HashMap;
+import java.util.*;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Student;
 
@@ -37,5 +37,21 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public Student deleteStudent(long id) {
         return students.remove(id);
+    }
+
+    @Override
+    public Collection<Student> findByAge(int age) {
+        ArrayList<Student> result = new ArrayList<>();
+        for (Student student : students.values()) {
+            if (student.getAge() == age) {
+                result.add(student);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Collection<Student> findAll() {
+        return students.values();
     }
 }
