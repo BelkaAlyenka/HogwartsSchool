@@ -26,7 +26,10 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student editStudent(Student student) {
-        return studentRepository.save(student);
+        if (studentRepository.existsById(student.getId())) {
+            return studentRepository.save(student);
+        }
+        return null;
     }
 
     @Override
@@ -46,5 +49,10 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public Collection<Student> findAll() {
         return studentRepository.findAll();
+    }
+
+    @Override
+    public Collection<Student> findByAgeBetween(int min, int max) {
+        return studentRepository.findByAgeBetween(min, max);
     }
 }

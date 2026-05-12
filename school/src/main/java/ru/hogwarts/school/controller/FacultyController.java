@@ -1,6 +1,5 @@
 package ru.hogwarts.school.controller;
 
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -20,11 +19,10 @@ public class FacultyController {
     }
 
     @GetMapping
-    public ResponseEntity<Collection<Faculty>> findFaculties(@RequestParam(required = false) String color) {
-        if (color != null && !color.isBlank()) {
-            return ResponseEntity.ok(facultyService.findByColor(color));
+    public ResponseEntity<Collection<Faculty>> findFaculties(@RequestParam(required = false) String search) {
+        if (search != null && !search.isBlank()) {
+            return ResponseEntity.ok(facultyService.findByNameOrColor(search));
         }
-
         return ResponseEntity.ok(facultyService.findAll());
     }
 

@@ -10,6 +10,6 @@ public interface FacultyService {
     Faculty editFaculty(Faculty faculty);
     Faculty deleteFaculty(long id);
 
-    Collection<Faculty> findByColor(String color);
     Collection<Faculty> findAll();
+    Collection<Faculty> findByNameOrColor(String search);
 }
