@@ -2,8 +2,11 @@ package ru.hogwarts.school.service;
 
 import java.util.*;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 
 @Service
@@ -50,5 +53,12 @@ public class FacultyServiceImpl implements FacultyService {
     @Override
     public Collection<Faculty> findByNameOrColor(String search) {
         return facultyRepository.findByNameContainingIgnoreCaseOrColorContainingIgnoreCase(search, search);
+    }
+
+    @Override
+    public Collection<Student> getStudentsByFacultyId(Long facultyId) {
+        return facultyRepository.findById(facultyId)
+                .map(Faculty::getStudents)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Факультет не найден"));
     }
 }
