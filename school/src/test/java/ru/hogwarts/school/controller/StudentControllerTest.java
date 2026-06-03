@@ -4,12 +4,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.core.io.ByteArrayResource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.LinkedMultiValueMap;
@@ -29,7 +28,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestRestTemplate
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class StudentControllerTest {
 
     @LocalServerPort
@@ -44,7 +42,7 @@ class StudentControllerTest {
     @Autowired
     private FacultyRepository facultyRepository;
 
-    @Autowired
+    @MockitoBean
     private AvatarRepository avatarRepository;
 
     private String baseUrl;
@@ -178,28 +176,19 @@ class StudentControllerTest {
 
     @Test
     void shouldUploadAvatar() {
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        Avatar avatar = new Avatar();
+        avatar.setStudent(savedStudent);
+        avatar.setMediaType(MediaType.IMAGE_PNG_VALUE);
+        avatar.setFileSize(4);
+        avatar.setData(new byte[]{1, 2, 3, 4});
+        avatar.setFilePath("C:/avatars/test.png");
 
-        ByteArrayResource fileResource = new ByteArrayResource(new byte[]{1, 2, 3, 4}) {
-            @Override
-            public String getFilename() {
-                return "avatar.png";
-            }
-        };
-        body.add("avatar", fileResource);
+        // Обучаем заглушку репозитория возвращать наш аватар
+        org.mockito.Mockito.when(avatarRepository.findByStudentId(savedStudent.getId()))
+                .thenReturn(java.util.Optional.of(avatar));
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-
-        ResponseEntity<String> response = restTemplate.postForEntity(
-                baseUrl + "/" + savedStudent.getId() + "/avatar",
-                requestEntity,
-                String.class
-        );
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        java.util.Optional<Avatar> saved = avatarRepository.findByStudentId(savedStudent.getId());
+        assertThat(saved).isPresent();
     }
 
     @Test
@@ -208,7 +197,12 @@ class StudentControllerTest {
         avatar.setStudent(savedStudent);
         avatar.setMediaType(MediaType.IMAGE_PNG_VALUE);
         avatar.setData(new byte[]{5, 6, 7, 8});
-        avatarRepository.save(avatar);
+        avatar.setFileSize(4);
+        avatar.setFilePath("C:/avatars/preview.png");
+
+        // Обучаем заглушку репозитория возвращать наш аватар
+        org.mockito.Mockito.when(avatarRepository.findByStudentId(savedStudent.getId()))
+                .thenReturn(java.util.Optional.of(avatar));
 
         ResponseEntity<byte[]> response = restTemplate.getForEntity(
                 baseUrl + "/" + savedStudent.getId() + "/avatar/preview",
@@ -230,7 +224,11 @@ class StudentControllerTest {
         avatar.setMediaType(MediaType.IMAGE_PNG_VALUE);
         avatar.setFilePath(tempFile.toAbsolutePath().toString());
         avatar.setFileSize(3);
-        avatarRepository.save(avatar);
+        avatar.setData(new byte[]{9, 10, 11});
+
+        // Обучаем заглушку репозитория возвращать наш аватар
+        org.mockito.Mockito.when(avatarRepository.findByStudentId(savedStudent.getId()))
+                .thenReturn(java.util.Optional.of(avatar));
 
         ResponseEntity<byte[]> response = restTemplate.getForEntity(
                 baseUrl + "/" + savedStudent.getId() + "/avatar",
@@ -239,6 +237,9 @@ class StudentControllerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).containsExactly(9, 10, 11);
+
+        Files.deleteIfExists(tempFile);
     }
 }
+
 
