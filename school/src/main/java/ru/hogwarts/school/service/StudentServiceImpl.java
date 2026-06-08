@@ -39,7 +39,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student findStudent(long id) {
-        return studentRepository.findById(id).orElseThrow();
+        return studentRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Avatar findAvatar(long studentId) {
-        return avatarRepository.findByStudentId(studentId).orElseThrow();
+        return avatarRepository.findByStudentId(studentId).orElse(null);
     }
 
     @Override
