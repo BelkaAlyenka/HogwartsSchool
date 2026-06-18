@@ -92,6 +92,10 @@ public class StudentController {
     public ResponseEntity<byte[]> downloadAvatar(@PathVariable Long id) {
         Avatar avatar = studentService.findAvatar(id);
 
+        if (avatar == null || avatar.getMediaType() == null || avatar.getData() == null) {
+            return ResponseEntity.notFound().build();
+        }
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(avatar.getMediaType()));
         headers.setContentLength(avatar.getData().length);
@@ -102,6 +106,11 @@ public class StudentController {
     @GetMapping(value = "/{id}/avatar")
     public void downloadAvatar(@PathVariable Long id, HttpServletResponse response) throws IOException {
         Avatar avatar = studentService.findAvatar(id);
+
+        if (avatar == null || avatar.getFilePath() == null) {
+            response.setStatus(404);
+            return;
+        }
 
         Path path = Path.of(avatar.getFilePath());
 
