@@ -78,6 +78,21 @@ public class StudentController {
         return ResponseEntity.ok(faculty);
     }
 
+    @GetMapping("/count")
+    public Integer getCountOfAllStudents() {
+        return studentService.getCountOfAllStudents();
+    }
+
+    @GetMapping("/average-age")
+    public Double getAverageAge() {
+        return studentService.getAverageAge();
+    }
+
+    @GetMapping("/last-five")
+    public Collection<Student> getLastFiveStudents() {
+        return studentService.getLastFiveStudents();
+    }
+
     @PostMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadAvatar(@PathVariable Long id, @RequestParam MultipartFile avatar) throws IOException {
         if (avatar.getSize() > 1024 * 300) {
@@ -121,5 +136,11 @@ public class StudentController {
             response.setContentLength((int) avatar.getFileSize());
             is.transferTo(os);
         }
+    }
+    @GetMapping("/avatars")
+    public Collection<Avatar> getAllAvatars(
+            @RequestParam("page") Integer pageNumber,
+            @RequestParam("size") Integer pageSize) {
+        return studentService.getAllAvatars(pageNumber, pageSize);
     }
 }
