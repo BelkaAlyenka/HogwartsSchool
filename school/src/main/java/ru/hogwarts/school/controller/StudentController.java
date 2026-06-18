@@ -107,6 +107,11 @@ public class StudentController {
     public void downloadAvatar(@PathVariable Long id, HttpServletResponse response) throws IOException {
         Avatar avatar = studentService.findAvatar(id);
 
+        if (avatar == null || avatar.getFilePath() == null) {
+            response.setStatus(404);
+            return;
+        }
+
         Path path = Path.of(avatar.getFilePath());
 
         try (InputStream is = Files.newInputStream(path);
