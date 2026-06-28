@@ -10,6 +10,7 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.AvatarRepository;
 import ru.hogwarts.school.repository.StudentRepository;
+import org.springframework.data.domain.PageRequest;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -110,6 +111,28 @@ public class StudentServiceImpl implements StudentService {
         avatar.setData(file.getBytes());
 
         avatarRepository.save(avatar);
+    }
+
+    @Override
+    public Integer getCountOfAllStudents() {
+        return studentRepository.getCountOfAllStudents();
+    }
+
+    @Override
+    public Double getAverageAge() {
+        return studentRepository.getAverageAge();
+    }
+
+    @Override
+    public Collection<Student> getLastFiveStudents() {
+        return studentRepository.getLastFiveStudents();
+    }
+
+    @Override
+    public Collection<Avatar> getAllAvatars(Integer pageNumber, Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
+
+        return avatarRepository.findAll(pageRequest).getContent();
     }
 
     private String getExtension(String fileName) {

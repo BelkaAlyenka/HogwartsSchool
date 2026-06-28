@@ -22,4 +22,9 @@ public interface StudentService {
 
     Avatar findAvatar(long studentId);
     void uploadAvatar(Long studentId, MultipartFile file) throws IOException;
+
+    Integer getCountOfAllStudents();
+    Double getAverageAge();
+    Collection<Student> getLastFiveStudents();
+    Collection<Avatar> getAllAvatars(Integer pageNumber, Integer pageSize);
 }
