@@ -143,4 +143,20 @@ public class StudentController {
             @RequestParam("size") Integer pageSize) {
         return studentService.getAllAvatars(pageNumber, pageSize);
     }
+
+    @GetMapping("/names-start-with-a")
+    public ResponseEntity<Collection<String>> getAllNamesStartingWithA() {
+        Collection<String> names = studentService.getAllNamesStartingWithA();
+        return ResponseEntity.ok(names);
+    }
+
+    @GetMapping("/average-age-stream")
+    public Double findAverageAgeOfAllStudents() {
+        return studentService.findAverageAgeOfAllStudents();
+    }
+
+    @GetMapping("/sum")
+    public Integer getFastSum() {
+        return studentService.getFastSum();
+    }
 }
