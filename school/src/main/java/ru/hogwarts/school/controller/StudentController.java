@@ -17,7 +17,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("student")
@@ -158,5 +160,55 @@ public class StudentController {
     @GetMapping("/sum")
     public Integer getFastSum() {
         return studentService.getFastSum();
+    }
+
+    @GetMapping("/students/print-parallel")
+    public void printStudentsInThreads() {
+        List<Student> students = new ArrayList<>(studentService.findAll());
+
+        if (students.size() < 6) {
+            System.out.println("Недостаточно студентов в базе.");
+            return;
+        }
+
+        System.out.println(students.get(0).getName());
+        System.out.println(students.get(1).getName());
+
+        new Thread(() -> {
+            System.out.println(students.get(2).getName());
+            System.out.println(students.get(3).getName());
+        }).start();
+
+        new Thread(() -> {
+            System.out.println(students.get(4).getName());
+            System.out.println(students.get(5).getName());
+        }).start();
+    }
+
+    @GetMapping("/students/print-synchronized")
+    public void printSynchronized() {
+        List<Student> students = new ArrayList<>(studentService.findAll());
+
+        if (students.size() < 6) {
+            System.out.println("В базе данных меньше 6 студентов!");
+            return;
+        }
+
+        printName(students.get(0).getName());
+        printName(students.get(1).getName());
+
+        new Thread(() -> {
+            printName(students.get(2).getName());
+            printName(students.get(3).getName());
+        }).start();
+
+        new Thread(() -> {
+            printName(students.get(4).getName());
+            printName(students.get(5).getName());
+        }).start();
+    }
+
+    private synchronized void printName(String name) {
+        System.out.println(name);
     }
 }
