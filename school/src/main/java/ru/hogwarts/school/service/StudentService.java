@@ -27,4 +27,7 @@ public interface StudentService {
     Double getAverageAge();
     Collection<Student> getLastFiveStudents();
     Collection<Avatar> getAllAvatars(Integer pageNumber, Integer pageSize);
+    Collection<String> getAllNamesStartingWithA();
+    Double findAverageAgeOfAllStudents();
+    Integer getFastSum();
 }

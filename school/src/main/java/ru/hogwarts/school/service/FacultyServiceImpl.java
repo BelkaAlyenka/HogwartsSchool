@@ -1,6 +1,8 @@
 package ru.hogwarts.school.service;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -79,5 +81,15 @@ public class FacultyServiceImpl implements FacultyService {
                     logger.error("No faculty with id={}", facultyId);
                     return new ResponseStatusException(HttpStatus.NOT_FOUND, "Факультет не найден");
                 });
+    }
+
+    @Override
+    public String findTheLongestFacultyName() {
+        logger.info("Was invoked method for finding the longest faculty name");
+
+        return facultyRepository.findAll().parallelStream()
+                .map(Faculty::getName)
+                .max(Comparator.comparingInt(String::length))
+                .orElse(null);
     }
 }

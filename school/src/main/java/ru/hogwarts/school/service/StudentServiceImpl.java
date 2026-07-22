@@ -19,6 +19,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Collection;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class StudentServiceImpl implements StudentService {
@@ -163,6 +165,35 @@ public class StudentServiceImpl implements StudentService {
         logger.info("Was invoked method for get all avatars with pagination");
         PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
         return avatarRepository.findAll(pageRequest).getContent();
+    }
+
+    @Override
+    public Collection<String> getAllNamesStartingWithA() {
+        logger.info("Was invoked method for get all names starting with A");
+
+        return studentRepository.findAll().parallelStream()
+                .map(Student::getName)
+                .map(String::toUpperCase)
+                .filter(name -> name.startsWith("A") || name.startsWith("А"))
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Double findAverageAgeOfAllStudents() {
+        logger.info("Was invoked method for calculation of the average age of all students");
+
+        return studentRepository.findAll().parallelStream()
+                .mapToInt(Student::getAge).average().orElse(0.0);
+    }
+
+    @Override
+    public Integer getFastSum() {
+        logger.info("Was invoked method for getting sum fast");
+
+        return IntStream.rangeClosed(1, 1_000_000)
+                .parallel()
+                .sum();
     }
 
     private String getExtension(String fileName) {
